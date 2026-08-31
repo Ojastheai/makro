@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { Utensils, Target, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { addFoodAction } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 const prisma = new PrismaClient();
 
@@ -64,9 +65,9 @@ export default async function FoodsPage() {
               </div>
             </div>
             
-            <button type="submit" className="w-full bg-primary text-primary-foreground py-2 rounded-md flex items-center justify-center gap-2">
+            <SubmitButton className="w-full bg-primary text-primary-foreground py-2 rounded-md flex items-center justify-center gap-2">
               <PlusCircle className="w-4 h-4" /> Save Food
-            </button>
+            </SubmitButton>
           </form>
         </section>
 

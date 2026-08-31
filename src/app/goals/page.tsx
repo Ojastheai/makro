@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { Utensils, Target, Scale } from "lucide-react";
 import Link from "next/link";
 import { updateGoalsAction, logWeightAction } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 const prisma = new PrismaClient();
 
@@ -54,9 +55,9 @@ export default async function GoalsPage() {
                 <input type="number" name="targetFat" required defaultValue={user.targetFat} className="w-full bg-input border border-border rounded p-2" />
               </div>
             </div>
-            <button type="submit" className="w-full bg-primary text-primary-foreground py-2 rounded-md font-medium">
+            <SubmitButton className="w-full bg-primary text-primary-foreground py-2 rounded-md font-medium">
               Update Goals
-            </button>
+            </SubmitButton>
           </form>
         </section>
 
@@ -67,9 +68,9 @@ export default async function GoalsPage() {
           </h2>
           <form action={logWeightAction} className="flex gap-2">
             <input type="number" step="0.1" name="weight" required placeholder="Weight (kg/lbs)" className="flex-1 bg-input border border-border rounded p-2" />
-            <button type="submit" className="bg-primary text-primary-foreground px-4 py-2 rounded-md font-medium">
+            <SubmitButton className="bg-primary text-primary-foreground px-4 py-2 rounded-md font-medium">
               Log
-            </button>
+            </SubmitButton>
           </form>
 
           <div className="mt-4 space-y-2">

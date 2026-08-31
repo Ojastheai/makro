@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { logMealAction } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 type FoodItem = {
   id: string;
@@ -72,13 +73,9 @@ export default function ClientLogMealForm({ foods }: { foods: FoodItem[] }) {
         </div>
       </div>
 
-      <button 
-        type="submit" 
-        className="w-full bg-primary text-primary-foreground py-3 rounded-md font-medium disabled:opacity-50"
-        disabled={!selectedFoodId}
-      >
+      <SubmitButton disabled={!selectedFoodId}>
         Log Meal
-      </button>
+      </SubmitButton>
     </form>
   );
 }
