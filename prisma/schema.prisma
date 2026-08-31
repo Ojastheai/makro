@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+
+  // Macros targets
+  targetCalories Int @default(2000)
+  targetProtein  Int @default(150)
+  targetCarbs    Int @default(200)
+  targetFat      Int @default(65)
+
+  weightLogs    WeightLog[]
+  dailyLogs     DailyLog[]
+  foodItems     FoodItem[] // User specific food items
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model WeightLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weight    Float
+  date      DateTime @default(now())
+}
+
+model FoodItem {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  calories     Float
+  protein      Float
+  carbs        Float
+  fat          Float
+  baseAmount   Float    // e.g., 100 for 100ml, 1 for 1 egg
+  baseUnit     String   // e.g., "ml", "egg", "g", "tsp", "scoop"
+  mealItems    MealItem[]
+}
+
+model DailyLog {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      String     // Format YYYY-MM-DD
+  mealItems MealItem[]
+
+  @@unique([userId, date])
+}
+
+model MealItem {
+  id         String   @id @default(cuid())
+  dailyLogId String
+  dailyLog   DailyLog @relation(fields: [dailyLogId], references: [id], onDelete: Cascade)
+  foodItemId String
+  foodItem   FoodItem @relation(fields: [foodItemId], references: [id], onDelete: Cascade)
+  mealPeriod String   // Breakfast, Lunch, Dinner, Snacks, Pre-Workout, Post-Workout
+  amount     Float    // User entered amount
+}
