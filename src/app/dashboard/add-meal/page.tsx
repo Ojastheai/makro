@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { logMealAction } from "./actions";
+import ClientLogMealForm from "./client-form";
 
 const prisma = new PrismaClient();
 
@@ -34,61 +35,7 @@ export default async function AddMealPage() {
             </Link>
           </div>
         ) : (
-          <form action={logMealAction} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Food Item</label>
-              <select 
-                name="foodItemId" 
-                required 
-                className="w-full bg-input border border-border rounded-md p-3 text-foreground"
-              >
-                <option value="">Select a food...</option>
-                {foods.map(f => (
-                  <option key={f.id} value={f.id}>
-                    {f.name} ({f.calories}kcal per {f.baseAmount}{f.baseUnit})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Meal Period</label>
-              <select 
-                name="mealPeriod" 
-                required
-                className="w-full bg-input border border-border rounded-md p-3 text-foreground"
-              >
-                <option value="Breakfast">Breakfast</option>
-                <option value="Lunch">Lunch</option>
-                <option value="Dinner">Dinner</option>
-                <option value="Snacks">Snacks</option>
-                <option value="Pre-Workout">Pre-Workout</option>
-                <option value="Post-Workout">Post-Workout</option>
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Amount</label>
-              <input 
-                type="number" 
-                step="0.1" 
-                name="amount" 
-                required 
-                placeholder="e.g. 1, 100, 2"
-                className="w-full bg-input border border-border rounded-md p-3 text-foreground"
-              />
-              <p className="text-xs text-muted-foreground">
-                Enter the amount matching the food's unit (e.g., if base unit is grams, enter grams).
-              </p>
-            </div>
-
-            <button 
-              type="submit" 
-              className="w-full bg-primary text-primary-foreground py-3 rounded-md font-medium"
-            >
-              Log Meal
-            </button>
-          </form>
+          <ClientLogMealForm foods={foods} />
         )}
       </main>
     </div>
