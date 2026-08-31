@@ -91,7 +91,7 @@ export default async function FoodsPage() {
       </main>
 
       {/* Bottom Nav */}
-      <nav className="fixed bottom-0 w-full bg-card border-t border-border flex justify-around p-3 pb-safe">
+      <nav className="fixed bottom-0 w-full z-50 bg-card border-t border-border flex justify-around p-3 pb-safe">
         <Link href="/dashboard" className="flex flex-col items-center text-muted-foreground hover:text-primary transition-colors">
           <Utensils className="w-6 h-6" />
           <span className="text-[10px] mt-1">Diary</span>
