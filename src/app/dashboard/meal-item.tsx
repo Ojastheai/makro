@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { editMealAction, deleteMealAction } from "./actions";
 import { Edit2, Trash2, Check, X } from "lucide-react";
 
@@ -24,7 +24,8 @@ type MealItemProps = {
 export function MealItem({ item }: MealItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [amount, setAmount] = useState(item.amount);
-  const [isDeleting, setIsDeleting] = useState(false);
+  
+  const [isPending, startTransition] = useTransition();
 
   const multiplier = item.amount / item.foodItem.baseAmount;
   const calories = Math.round(item.foodItem.calories * multiplier);
@@ -32,27 +33,29 @@ export function MealItem({ item }: MealItemProps) {
   const carbs = Math.round(item.foodItem.carbs * multiplier);
   const fat = Math.round(item.foodItem.fat * multiplier);
 
-  const handleEdit = async () => {
-    try {
-      await editMealAction(item.id, Number(amount));
-      setIsEditing(false);
-    } catch (e) {
-      console.error(e);
-    }
+  const handleEdit = () => {
+    startTransition(async () => {
+      try {
+        await editMealAction(item.id, Number(amount));
+        setIsEditing(false);
+      } catch (e) {
+        console.error(e);
+      }
+    });
   };
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      await deleteMealAction(item.id);
-    } catch (e) {
-      console.error(e);
-      setIsDeleting(false);
-    }
+  const handleDelete = () => {
+    startTransition(async () => {
+      try {
+        await deleteMealAction(item.id);
+      } catch (e) {
+        console.error(e);
+      }
+    });
   };
 
   return (
-    <div className="bg-card p-3 rounded-lg border border-border flex justify-between items-center group transition hover:shadow-sm">
+    <div className={`bg-card p-3 rounded-lg border border-border flex justify-between items-center group transition hover:shadow-sm ${isPending ? 'opacity-50 pointer-events-none' : ''}`}>
       <div className="flex-1">
         <h4 className="font-medium">{item.foodItem.name}</h4>
         
@@ -65,12 +68,13 @@ export function MealItem({ item }: MealItemProps) {
               className="w-20 px-2 py-1 text-sm border border-input rounded bg-background"
               step="any"
               min="0"
+              disabled={isPending}
             />
             <span className="text-sm text-muted-foreground">{item.foodItem.baseUnit}</span>
-            <button onClick={handleEdit} className="text-green-500 p-1 hover:bg-green-500/10 rounded">
-              <Check className="w-4 h-4" />
+            <button onClick={handleEdit} disabled={isPending} className="text-green-500 p-1 hover:bg-green-500/10 rounded">
+              {isPending ? <div className="w-4 h-4 border-2 border-green-500/30 border-t-green-500 rounded-full animate-spin" /> : <Check className="w-4 h-4" />}
             </button>
-            <button onClick={() => { setIsEditing(false); setAmount(item.amount); }} className="text-red-500 p-1 hover:bg-red-500/10 rounded">
+            <button onClick={() => { setIsEditing(false); setAmount(item.amount); }} disabled={isPending} className="text-red-500 p-1 hover:bg-red-500/10 rounded">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -89,11 +93,11 @@ export function MealItem({ item }: MealItemProps) {
         
         {!isEditing && (
           <div className="flex flex-col gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-            <button onClick={() => setIsEditing(true)} className="text-blue-500 hover:bg-blue-500/10 p-1.5 rounded-full" title="Edit amount">
+            <button onClick={() => setIsEditing(true)} disabled={isPending} className="text-blue-500 hover:bg-blue-500/10 p-1.5 rounded-full" title="Edit amount">
               <Edit2 className="w-3.5 h-3.5" />
             </button>
-            <button onClick={handleDelete} disabled={isDeleting} className="text-red-500 hover:bg-red-500/10 p-1.5 rounded-full" title="Delete meal">
-              <Trash2 className="w-3.5 h-3.5" />
+            <button onClick={handleDelete} disabled={isPending} className="text-red-500 hover:bg-red-500/10 p-1.5 rounded-full" title="Delete meal">
+              {isPending ? <div className="w-3.5 h-3.5 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
             </button>
           </div>
         )}

@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { format, addDays, subDays, parseISO } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 export function CalendarHeader({ initialDate }: { initialDate: string }) {
   const router = useRouter();
@@ -12,13 +12,16 @@ export function CalendarHeader({ initialDate }: { initialDate: string }) {
 
   // We ensure the date looks like YYYY-MM-DD
   const [currentDate, setCurrentDate] = useState(dateParam);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setCurrentDate(dateParam);
   }, [dateParam]);
 
   const handleDateChange = (newDate: string) => {
-    router.push(`/dashboard?date=${newDate}`);
+    startTransition(() => {
+      router.push(`/dashboard?date=${newDate}`);
+    });
   };
 
   const parsedDate = parseISO(currentDate);
@@ -39,24 +42,30 @@ export function CalendarHeader({ initialDate }: { initialDate: string }) {
   }
 
   return (
-    <div className="flex items-center justify-between bg-primary text-primary-foreground p-3 rounded-xl shadow-md">
+    <div className={`flex items-center justify-between bg-primary text-primary-foreground p-3 rounded-xl shadow-md transition-opacity duration-200 ${isPending ? "opacity-60" : "opacity-100"}`}>
       <button 
         onClick={() => handleDateChange(prevDay)}
-        className="p-2 hover:bg-primary-foreground/20 rounded-full transition"
+        disabled={isPending}
+        className="p-2 hover:bg-primary-foreground/20 rounded-full transition disabled:opacity-50"
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
 
       <div className="flex flex-col items-center">
         <div className="flex items-center gap-2">
-          <Calendar className="w-4 h-4 opacity-80" />
+          {isPending ? (
+            <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+          ) : (
+            <Calendar className="w-4 h-4 opacity-80" />
+          )}
           <span className="font-semibold text-lg">{displayDate}</span>
         </div>
       </div>
 
       <button 
         onClick={() => handleDateChange(nextDay)}
-        className="p-2 hover:bg-primary-foreground/20 rounded-full transition"
+        disabled={isPending}
+        className="p-2 hover:bg-primary-foreground/20 rounded-full transition disabled:opacity-50"
       >
         <ChevronRight className="w-5 h-5" />
       </button>
