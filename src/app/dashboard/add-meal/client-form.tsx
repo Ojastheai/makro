@@ -12,13 +12,22 @@ type FoodItem = {
   baseUnit: string;
 };
 
-export default function ClientLogMealForm({ foods }: { foods: FoodItem[] }) {
+export default function ClientLogMealForm({ 
+  foods, 
+  initialDate, 
+  initialPeriod 
+}: { 
+  foods: FoodItem[]; 
+  initialDate: string; 
+  initialPeriod: string; 
+}) {
   const [selectedFoodId, setSelectedFoodId] = useState<string>("");
 
   const selectedFood = foods.find(f => f.id === selectedFoodId);
 
   return (
     <form action={logMealAction} className="space-y-6">
+      <input type="hidden" name="date" value={initialDate} />
       <div className="space-y-2">
         <label className="text-sm font-medium">Food Item</label>
         <select 
@@ -42,6 +51,7 @@ export default function ClientLogMealForm({ foods }: { foods: FoodItem[] }) {
         <select 
           name="mealPeriod" 
           required
+          defaultValue={initialPeriod}
           className="w-full bg-input border border-border rounded-md p-3 text-foreground"
         >
           <option value="Breakfast">Breakfast</option>

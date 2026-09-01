@@ -8,9 +8,13 @@ import ClientLogMealForm from "./client-form";
 
 const prisma = new PrismaClient();
 
-export default async function AddMealPage() {
+export default async function AddMealPage({ searchParams }: { searchParams: Promise<{ date?: string, period?: string }> }) {
   const session = await auth();
   if (!session?.user?.id) redirect("/");
+
+  const params = await searchParams;
+  const date = params?.date || new Date().toISOString().split("T")[0];
+  const period = params?.period || "Breakfast";
 
   const foods = await prisma.foodItem.findMany({
     where: { userId: session.user.id },
@@ -20,7 +24,7 @@ export default async function AddMealPage() {
   return (
     <div className="min-h-screen bg-background pb-20">
       <header className="p-4 flex items-center gap-4 border-b border-border">
-        <Link href="/dashboard" className="text-muted-foreground hover:text-foreground">
+        <Link href={`/dashboard?date=${date}`} className="text-muted-foreground hover:text-foreground">
           <ArrowLeft className="w-6 h-6" />
         </Link>
         <h1 className="text-xl font-bold">Add Meal</h1>
@@ -35,7 +39,7 @@ export default async function AddMealPage() {
             </Link>
           </div>
         ) : (
-          <ClientLogMealForm foods={foods} />
+          <ClientLogMealForm foods={foods} initialDate={date} initialPeriod={period} />
         )}
       </main>
     </div>

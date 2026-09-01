@@ -8,15 +8,16 @@ import { MealItem } from "./meal-item";
 
 const prisma = new PrismaClient();
 
-export default async function Dashboard({ searchParams }: { searchParams: { date?: string } }) {
+export default async function Dashboard({ searchParams }: { searchParams: Promise<{ date?: string }> }) {
   const session = await auth();
   if (!session?.user) {
     redirect("/");
   }
 
   // Parse the date searchParam
+  const params = await searchParams;
   const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-  const date = searchParams.date || today;
+  const date = params?.date || today;
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },

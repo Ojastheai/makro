@@ -19,14 +19,14 @@ export async function logMealAction(formData: FormData) {
     throw new Error("Invalid input");
   }
 
-  const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+  const date = formData.get("date") as string || new Date().toISOString().split("T")[0];
 
-  // Find or create today's log
+  // Find or create daily log for that specific date
   let dailyLog = await prisma.dailyLog.findUnique({
     where: {
       userId_date: {
         userId: session.user.id,
-        date: today,
+        date,
       }
     }
   });
@@ -35,7 +35,7 @@ export async function logMealAction(formData: FormData) {
     dailyLog = await prisma.dailyLog.create({
       data: {
         userId: session.user.id,
-        date: today,
+        date,
       }
     });
   }
@@ -49,5 +49,5 @@ export async function logMealAction(formData: FormData) {
     }
   });
 
-  redirect("/dashboard");
+  redirect(`/dashboard?date=${date}`);
 }
